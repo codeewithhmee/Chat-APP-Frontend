@@ -24,7 +24,7 @@ const ChatRoom = () => {
     async function getMessages() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/user/messages/${id}`,
+          `https://chat-app-backend-v8ey.onrender.com/api/user/messages/${id}`,
         );
 
         const data = await res.json();
