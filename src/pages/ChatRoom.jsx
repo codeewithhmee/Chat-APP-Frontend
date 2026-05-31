@@ -164,9 +164,10 @@ const ChatRoom = () => {
       <div className="chatroom-header">
         <div>
           <h2>💬 Chat Room</h2>
-          <p>Room ID: {id}</p>
+          <p><span className="lll">Room Id</span> {id}</p>
         </div>
         <button 
+        className="ll"
           style={{ 
             backgroundColor: "lightblue", 
             border: "none", 
