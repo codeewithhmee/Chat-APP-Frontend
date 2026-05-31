@@ -97,7 +97,7 @@ const ChatRoom = () => {
   // save message to DB
   async function saveMessage(data) {
     try {
-      await fetch("http://localhost:5000/api/user/save", {
+      await fetch("https://chat-app-backend-v8ey.onrender.com/api/user/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
