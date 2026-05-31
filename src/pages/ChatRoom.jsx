@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 
@@ -10,16 +10,23 @@ const ChatRoom = () => {
   const [leave, setleave] = useState(null);
   const [light, setLight] = useState(true);
   const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
-  
-  const [allMessages, setAllMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  const [allMessages, setAllMessages] = useState([]);
+  
+  // refto track the bottom of the chat container
+  const messagesEndRef = useRef(null);
   // login check
   useEffect(() => {
     if (!localStorage.getItem("user_id")) {
       navigate("/login");
     }
   }, []);
+
+  //auto scrool
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [allMessages]);
 
   // load old messages
   useEffect(() => {
@@ -38,7 +45,7 @@ const ChatRoom = () => {
           avatar: msg.sender.avatar,
           message: msg.text,
         }));
-        const reverse=formatted.reverse()
+        const reverse = formatted.reverse();
         setAllMessages(reverse);
       } catch (err) {
         console.error(err);
@@ -48,8 +55,8 @@ const ChatRoom = () => {
 
     getMessages();
   }, [id]);
-  //socket
 
+  //socket
   useEffect(() => {
     // join room
     socket.emit("join_room", {
@@ -57,7 +64,7 @@ const ChatRoom = () => {
       roomId: id,
     });
 
-    // handel user join
+    // handle user join
     const handleJoined = (e) => {
       console.log(e.name, "joined");
       setJoined(e.name);
@@ -66,7 +73,7 @@ const ChatRoom = () => {
       }, 2000);
     };
 
-    // handel user left
+    // handle user left
     const handleUserLeft = (name) => {
       console.log(name, "left");
       setleave(name);
@@ -75,7 +82,7 @@ const ChatRoom = () => {
       }, 2000);
     };
 
-    // handel meaagse
+    // handle message
     const handleMessage = (data) => {
       setAllMessages((prev) => [
         ...prev,
@@ -98,6 +105,7 @@ const ChatRoom = () => {
       socket.off("receive_message", handleMessage);
     };
   }, [id]);
+
   // save message to DB
   async function saveMessage(data) {
     try {
@@ -116,9 +124,10 @@ const ChatRoom = () => {
       console.error(error);
     }
   }
+
   //toggle theme
   function toggleTheme() {
-    setLight(light?false:true);
+    setLight(light ? false : true);
   }
 
   // send message
@@ -141,6 +150,7 @@ const ChatRoom = () => {
 
     setMessage("");
   }
+
   const handleLeave = () => {
     socket.emit("leave_room");
 
@@ -156,8 +166,18 @@ const ChatRoom = () => {
           <h2>💬 Chat Room</h2>
           <p>Room ID: {id}</p>
         </div>
-        <button style={{ backgroundColor:"lightblue",border:"none",outline:"none",cursor:"pointer",
-          borderRadius:"15px"}} onClick={toggleTheme}>{light ? "Dark" : "Light"}</button>
+        <button 
+          style={{ 
+            backgroundColor: "lightblue", 
+            border: "none", 
+            outline: "none", 
+            cursor: "pointer",
+            borderRadius: "15px"
+          }} 
+          onClick={toggleTheme}
+        >
+          {light ? "Dark" : "Light"}
+        </button>
         <button onClick={handleLeave} className="leave-btn">
           Leave Room
         </button>
@@ -168,9 +188,8 @@ const ChatRoom = () => {
           backgroundColor: light ? "white" : "black",
         }}
         className="messages-container"
-        
       >
-         {loading && <div className="loading"></div>}
+        {loading && <div className="loading"></div>}
         {joined && <div className="user_joined ">{joined} Joined....</div>}
         {leave && <div className="user_left">{leave} left....</div>}
 
@@ -195,6 +214,8 @@ const ChatRoom = () => {
             </div>
           );
         })}
+        {/* this div pushes */}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="input-container">
