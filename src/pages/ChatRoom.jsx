@@ -10,6 +10,8 @@ const ChatRoom = () => {
   const [leave, setleave] = useState(null);
   const [light, setLight] = useState(true);
   const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+  
   const [allMessages, setAllMessages] = useState([]);
 
   // login check
@@ -21,6 +23,7 @@ const ChatRoom = () => {
 
   // load old messages
   useEffect(() => {
+    setLoading(true)
     async function getMessages() {
       try {
         const res = await fetch(
@@ -40,6 +43,7 @@ const ChatRoom = () => {
       } catch (err) {
         console.error(err);
       }
+      setLoading(false)
     }
 
     getMessages();
@@ -166,6 +170,7 @@ const ChatRoom = () => {
         className="messages-container"
         
       >
+         {loading && <div className="loading"></div>}
         {joined && <div className="user_joined ">{joined} Joined....</div>}
         {leave && <div className="user_left">{leave} left....</div>}
 
