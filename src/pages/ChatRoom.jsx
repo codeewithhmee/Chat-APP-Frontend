@@ -38,8 +38,8 @@ const ChatRoom = () => {
           avatar: msg.sender.avatar,
           message: msg.text,
         }));
-
-        setAllMessages(formatted);
+        const reverse=formatted.reverse()
+        setAllMessages(reverse);
       } catch (err) {
         console.error(err);
       }
